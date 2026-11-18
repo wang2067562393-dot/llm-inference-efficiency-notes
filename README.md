@@ -3,6 +3,7 @@
 > 大模型推理效率学习笔记：从 KV Cache 压缩、视觉 Token 削减到投机解码，附实验评测方法论。
 > 目标：用一页纸讲清每种方法的「瓶颈 → 直觉 → 做法 → 代价」，并坚持所有结论可复算、可证伪。
 
+![tests](https://github.com/wang2067562393-dot/llm-inference-efficiency-notes/actions/workflows/tests.yml/badge.svg)
 ![status](https://img.shields.io/badge/status-WIP%20建设中-F59E0B)
 ![focus](https://img.shields.io/badge/focus-推理加速-6366F1)
 ![method](https://img.shields.io/badge/method-多seed对照%20%7C%20归一化评分%20%7C%20防污染-16A34A)
@@ -36,6 +37,21 @@
 3. [投机解码与 EAGLE](notes/03-speculative-decoding.md)：接受率为什么决定墙钟收益，动态草稿深度
 4. [实验与评测方法论](notes/04-evaluation-methodology.md)：配对多 seed、样本标准差、3σ 启发式、归一化锚点、Dev/Private 隔离、reward hacking
 5. [参考资料清单](references.md)：公开论文与开源仓库
+
+## 🧰 可运行小工具（`tools/`，附单元测试与 CI）
+
+光有文字不够，笔记里的公式都落成了可执行代码：
+
+| 工具 | 作用 | 示例 |
+|---|---|---|
+| `tools/kv_budget.py` | KV Cache 显存估算（层数/KV 头/维度/序列长度/精度） | `python tools/kv_budget.py` → 32 层 GQA(8 头)、16K、BF16 ≈ 2.0 GiB |
+| `tools/paired_eval.py` | 配对多 seed 统计：样本标准差、Δ/σ、归一化分 | `python tools/paired_eval.py --baseline .60 .61 .62 --reference .66 .67 .68 --upper-anchor 1` |
+| `tools/attention_numpy.py` | NumPy 手写 Scaled Dot-Product Attention（含 causal mask 与自测） | `python tools/attention_numpy.py --selftest` |
+
+```bash
+pip install -r tools/requirements.txt
+python -m unittest discover -s tools/tests -v   # 9 个测试
+```
 
 ## 学习原则
 

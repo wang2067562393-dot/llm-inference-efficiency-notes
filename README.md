@@ -3,6 +3,8 @@
 > 大模型推理效率学习笔记：从 KV Cache 压缩、视觉 Token 削减到投机解码，附实验评测方法论。
 > 目标：用一页纸讲清每种方法的「瓶颈 → 直觉 → 做法 → 代价」，并坚持所有结论可复算、可证伪。
 
+> 🧭 **第一次进来、不知道从哪读起：先看 [GETTING_STARTED.md](GETTING_STARTED.md)**（含 3 小时第一遍路线、四问法、自查表）。
+
 ![tests](https://github.com/wang2067562393-dot/llm-inference-efficiency-notes/actions/workflows/tests.yml/badge.svg)
 ![status](https://img.shields.io/badge/status-WIP%20建设中-F59E0B)
 ![focus](https://img.shields.io/badge/focus-推理加速-6366F1)

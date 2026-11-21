@@ -11,7 +11,6 @@ TOOLS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLS))
 
 from kv_budget import gqa_ratio, kv_bytes_per_token, kv_cache_gb  # noqa: E402
-from paired_eval import paired_evaluate, sample_std  # noqa: E402
 from attention_numpy import scaled_dot_product_attention, softmax  # noqa: E402
 
 
@@ -31,29 +30,6 @@ class TestKVBudget(unittest.TestCase):
         a = kv_cache_gb(32, 8, 128, 4096, dtype="fp16")
         b = kv_cache_gb(32, 8, 128, 4096, dtype="int4")
         self.assertAlmostEqual(a / b, 4.0, places=6)
-
-
-class TestPairedEval(unittest.TestCase):
-    def test_worked_example(self):
-        # 笔记里的例子：B=[0.60,0.61,0.62], R=[0.66,0.67,0.68]
-        res = paired_evaluate([0.60, 0.61, 0.62], [0.66, 0.67, 0.68], upper_anchor=1.0)
-        self.assertAlmostEqual(res.baseline_mean, 0.61, places=10)
-        self.assertAlmostEqual(res.reference_mean, 0.67, places=10)
-        self.assertAlmostEqual(res.delta, 0.06, places=10)
-        self.assertAlmostEqual(res.baseline_std, 0.01, places=10)
-        self.assertAlmostEqual(res.sigma_multiple, 6.0, places=6)
-        self.assertAlmostEqual(res.normalized_score, 0.06 / 0.39, places=4)
-
-    def test_lower_is_better(self):
-        # ms/token：B≈8.49 -> R≈4.84, U=0
-        res = paired_evaluate([8.57, 8.45, 8.47], [4.85, 4.83, 4.85], 0.0, higher_is_better=False)
-        self.assertGreater(res.delta, 0)
-        self.assertAlmostEqual(res.normalized_score, 1 - res.reference_mean / res.baseline_mean, places=10)
-
-    def test_sample_std_ddof1(self):
-        self.assertAlmostEqual(sample_std([0.60, 0.61, 0.62]), 0.01, places=10)
-        with self.assertRaises(ValueError):
-            sample_std([1.0])
 
 
 class TestAttention(unittest.TestCase):

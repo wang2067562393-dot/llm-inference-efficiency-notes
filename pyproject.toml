@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-eval-tools"
+version = "0.2.0"
+description = "大模型推理效率笔记的配套代码：评测判定（3σ / 归一化评分）与任务包发布前自检"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "wang" }]
+keywords = ["llm", "evaluation", "inference", "benchmark", "statistics"]
+
+[project.scripts]
+evalkit = "evalkit.cli:main"
+
+[tool.setuptools]
+packages = ["evalkit"]
+
+[tool.ruff]
+line-length = 100

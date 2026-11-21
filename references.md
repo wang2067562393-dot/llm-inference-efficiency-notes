@@ -28,7 +28,7 @@
 
 - **SWE-bench**: *Can LLMs Resolve Real-World GitHub Issues?* (ICLR 2024)
 - **MLE-Bench**: *MLE-Bench: Evaluating Machine Learning Agents on Machine Learning Engineering* (2024)
-- Agentic RL 相关公开技术报告（2025–2026 各实验室发布，持续跟进）
+- **Harbor**：agentic 任务的格式与运行框架 — <https://github.com/harbor-framework/harbor>
 
 ## 工具链
 

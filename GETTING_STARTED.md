@@ -11,7 +11,7 @@
 |---|---|---|
 | 不知道 KV Cache 是什么 | 缺前置概念 | 先补：自注意力 → 自回归生成，再进 ① |
 | 知道 KV 但看不懂"为什么压缩不怎么掉点" | 缺直觉 | 读 ① 时配合 `tools/kv_budget.py` 算显存 |
-| 方法懂了，但看不懂 σ、归一化分 | 缺评测方法 | 直接跳到 ④，跑 `tools/paired_eval.py` |
+| 方法懂了，但看不懂 σ、归一化分 | 缺评测方法 | 直接跳到 ④，跑 `python -m evalkit stats` |
 | 全都似懂非懂 | 正常 | 按下面"第一遍路线"走，不求全懂 |
 
 ## 第一遍路线（约 3 小时，只求主线）
@@ -36,10 +36,11 @@
   → 这篇最容易读：576 个图像 patch 为什么冗余？
   → 重点看"典型失败模式"那节（Public 通过、Private 崩掉）
 
-第 4 步（50 分钟）notes/04-evaluation-methodology.md + tools/paired_eval.py
+第 4 步（50 分钟）notes/04-evaluation-methodology.md + evalkit
   → 这是全仓库的灵魂。亲手跑：
-    python tools/paired_eval.py --baseline .60 .61 .62 --reference .66 .67 .68 --upper-anchor 1
+    python -m evalkit stats --baseline .60 .61 .62 --reference .66 .67 .68 --upper 1 --accept-range 0.15 0.8
   → 再自己改一组数字，看 Δ/σ 和 score 怎么变
+  → 然后故意让 σ=0、让单位混用、让 U 落在错误一侧，看它怎么报错
 
 第 5 步（15 分钟）tools/attention_numpy.py
   python tools/attention_numpy.py --selftest
@@ -52,8 +53,9 @@
 |---|---|---|
 | 01 KV 压缩 | 用 `kv_budget.py` 算 3 个真实模型配置（7B/13B/70B，L=4k/32k/128k），整理成表 | 能口算 32K 上下文的 KV 量级 |
 | 02 视觉 token | 数清楚 336×336 图片怎么变成 576 个 patch | 能手画 CLIP→projector→LLM 数据流 |
-| 03 投机解码 | 给 `paired_eval.py` 喂一组 ms/token 数据（越低越好，`--lower-is-better --upper-anchor 0`） | 能解释为什么延迟改善要配对测 |
+| 03 投机解码 | 给 `evalkit stats` 喂一组 ms/token 数据（越低越好：`--direction minimize --upper 0`） | 能解释为什么延迟改善要配对测 |
 | 04 评测方法论 | 自己造 3 组 B/R 数据：稳过 3σ、勉强、σ=0 无法判定 | 能讲清"3σ 不是 99.7% 置信度" |
+| 04 补充：任务包自检 | 用 `python -m evalkit lint` 扫一个故意有缺陷的任务包，先猜哪几条会报，再看结果 | 能说出答案泄漏和 oracle 泄漏的区别 |
 
 ## 每篇笔记的固定读法（四问法）
 
@@ -68,7 +70,7 @@
 
 - **公式看不懂**：先看公式旁的中文直觉，再去 `tools/` 里找对应代码，代码比符号好懂；
 - **术语太多**：第一次全部跳过（GQA、MQA、NLOS……），第二遍再逐个查，每个术语只允许花 5 分钟；
-- **感觉空泛**：一定是因为还没动手。这个仓库每一个结论都配了可运行的东西，去跑它；
+- **感觉空泛**：先动手。判定规则（3σ、归一化、质量门）已经全部实现成带测试的代码，去跑它、去改坏它、看它报什么错；论文里的性能结论不在其中，那些需要你自己复现。
 - **想深入**：按 `references.md` 里的论文顺序读，一次只读一篇，先读 EAGLE 和 SnapKV。
 
 ## 和另外两个仓库的关系

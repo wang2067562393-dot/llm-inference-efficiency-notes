@@ -1,4 +1,4 @@
-name: tools-tests
+name: tests
 
 on:
   push:
@@ -8,13 +8,27 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           cache: pip
-      - name: Install numpy
-        run: pip install -r tools/requirements.txt
-      - name: Run tools unit tests
-        run: python -m unittest discover -s tools/tests -v
+
+      - name: 评测判定与任务包自检（evalkit，零依赖）
+        run: python -m unittest discover -s tests -v
+
+      - name: CLI 冒烟
+        run: |
+          python -m evalkit stats --baseline 0.60 0.61 0.62 \
+            --reference 0.66 0.67 0.68 --upper 1 --accept-range 0.15 0.8
+          python -m evalkit lint tests/fixtures/good_task
+
+      - name: 笔记配套小工具（需要 numpy）
+        run: |
+          python -m pip install -r tools/requirements.txt
+          python -m unittest discover -s tools/tests -v

@@ -1,0 +1,6 @@
+[timeouts]
+wall = 7200
+setup = 900
+
+[resources]
+gpus = 1

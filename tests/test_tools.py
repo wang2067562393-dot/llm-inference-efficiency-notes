@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 
-TOOLS = Path(__file__).resolve().parents[1]
+TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 
 from kv_budget import gqa_ratio, kv_bytes_per_token, kv_cache_gb  # noqa: E402
